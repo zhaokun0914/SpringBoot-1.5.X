@@ -1,5 +1,7 @@
 #自动配置原理
+
 ##1、自动配置原理：
+
 1）、SpringBoot启动的时候加载主配置类，开启了自动配置功能 ``==@EnableAutoConfiguration==``
 
 2）、**@EnableAutoConfiguration 作用**：
