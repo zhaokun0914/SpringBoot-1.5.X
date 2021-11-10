@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.fortunebill</groupId>
+    <artifactId>spring-boot-01-helloworld</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>spring-boot-01-helloworld</name>
+    <description>spring-boot-01-helloworld</description>
+
+    <!--
+        <parent>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-parent</artifactId>
+            <version>1.5.9.RELEASE</version>
+            <relativePath/>
+        </parent>
+        ↑该parent是所有【spring-boot-starter】的【父项目】
+
+        <parent>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-dependencies</artifactId>
+            <version>1.5.9.RELEASE</version>
+		    <relativePath>../spring-boot-dependencies</relativePath>
+	    </parent>
+	    ↑它来真正管理Spring Boot应用程序里的所有依赖版本，也可以称它为Spring Boot的版本仲裁中心，以后我们导入依赖默认是不需要写版本的。
+	    没有在 dependencies 里面管理的依赖自然需要申明版本号
+    -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>1.5.9.RELEASE</version>
+        <relativePath/>
+    </parent>
+
+
+    <properties>
+        <java.version>1.8</java.version>
+    </properties>
+
+    <dependencies>
+        <!--
+            启动器
+            [spring-boot-starter]-[web]
+            [spring-boot-starter]：springboot场景启动器；帮我们导入了web模块正常运行所依赖的组件
+            springboot将所有的功能场景都抽取出来，做成一个个的starter（启动器），只需要在项目里引入这些starter相关场景的所有依赖都会导入进来。
+            要用什么功能，就导入什么场景启动器。
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

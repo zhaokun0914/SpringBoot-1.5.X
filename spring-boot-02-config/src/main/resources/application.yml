@@ -1,0 +1,67 @@
+# .yml是YAML(YAML Ain't Markup Language)语言的文件，以数据为中心，比json、xml等更适合做配置文件
+
+# YAML语法
+# YAML基本语法
+#   使用缩进表示层级关系
+#   缩进是不允许使用Tab键，只允许使用空格
+#   缩进的空格数目不重要，只要相同层级的元素左侧对其即可
+#   大小写敏感
+#   可以使用 "-小写字母" 或 "_小写字母"来 代替 "大写字母",如 userName 与 user-name ,user_name 含义是一样的
+
+# YAML支持的三种数据结构
+#   字面量：普通的值（数字、字符串、布尔）
+#     例如 -> age: 18
+#     例如 -> name: mysgk
+
+#     k: v：字面量直接写；
+#       [字符串]默认不用加上[单引号]或者[双引号]
+#       ""：双引号，[不会转义]特殊字符
+#         例如：name: "zhangsan\n lisi" 输出 -> zhangsan\n  lisi
+#       ''：单引号，[会转义]特殊字符
+#         例如：name: "zhangsan\n lisi" 输出 -> zhangsan换行  lisi
+
+#   对象：Map（属性和值）（键值对）
+#     对象还是k: v的方式
+#     k: v：在下一行来写对象的属性和值的关系；注意缩进(不支持tab,使用空格),如:
+#       person:
+#         age: 18
+#         name: mysgk
+#     行内写法：fridens: {lastName: zhangsan,age: 18}
+
+#   数组：List、Set
+#     用- 值表示数组中的一个元素,如:
+#       hands:
+#         - left
+#         - right
+#     行内写法：pets: {cat, dog, pig}
+
+#person:
+#  lastName: zhangsan
+#  age: 18
+#  boss: false
+#  brith: 2021/11/09 12:12:12
+#  maps: {key1: value1, key2: value2}
+#  lists:
+#    - 李四
+#    - 王五
+#  dog:
+#    name: 小花
+#    age: 2
+
+#   文档块
+#     多个文档用---隔开
+#server:
+#  port: 8081
+#spring:
+#  profiles:
+#    active: dev #指定使用哪个环境
+#---
+#spring:
+#  profiles: dev #指定属于哪个环境
+#server:
+#  port: 8082
+#---
+#spring:
+#  profiles: prod #指定属于哪个环境
+#server:
+#  port: 8083
