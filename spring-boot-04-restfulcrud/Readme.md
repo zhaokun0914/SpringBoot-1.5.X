@@ -382,13 +382,13 @@ Spring Boot 自动配置好了SpringMVC
 以下是SpringBoot对SpringMVC的默认配置:（`WebMvcAutoConfiguration`）
 
 1. 包含`ContentNegotiatingViewResolver` 和 `BeanNameViewResolver` beans.
-    - 自动配置了ViewResolver（视图解析器：根据方法的返回值得到视图对象（View），视图对象决定如何渲染（转发？重定向？））
-    - `ContentNegotiatingViewResolver`：组合所有的视图解析器的；
-    - 如何定制？：我们可以自己给容器中添加一个视图解析器；自动的将其组合进来；
+   - 自动配置了ViewResolver（视图解析器：根据方法的返回值得到视图对象（View），视图对象决定如何渲染（转发？重定向？））
+   - `ContentNegotiatingViewResolver`：组合所有的视图解析器的；
+   - 如何定制？：我们可以自己给容器中添加一个视图解析器；自动的将其组合进来；
 2. 支持提供静态资源，包括对 WebJars 的支持（见下文）.静态资源文件夹路径，webjars
 3. 自动注册了`Converter `, `GenericConverter `, `Formatter` beans.
-    - Converter：转换器； public String hello(User user)：类型转换使用Converter
-    - `Formatter `格式化器； 2017.12.17===Date；
+   - Converter：转换器； public String hello(User user)：类型转换使用Converter
+   - `Formatter `格式化器； 2017.12.17===Date；
 
 ```
 @Bean
@@ -401,9 +401,9 @@ public Formatter<Date> dateFormatter() {
 自己添加的格式化器转换器，我们只需要放在容器中即可
 
 4. 支持 `HttpMessageConverters `(see below).
-    - `HttpMessageConverter`：SpringMVC用来转换Http请求和响应的；User---Json；
-    - `HttpMessageConverters `是从容器中确定；获取所有的`HttpMessageConverter`；
-      自己给容器中添加`HttpMessageConverter`，只需要将自己的组件注册到容器中（@Bean、@Component）
+   - `HttpMessageConverter`：SpringMVC用来转换Http请求和响应的；User---Json；
+   - `HttpMessageConverters `是从容器中确定；获取所有的`HttpMessageConverter`；
+     自己给容器中添加`HttpMessageConverter`，只需要将自己的组件注册到容器中（@Bean、@Component）
 5. 自动注册 `MessageCodesResolver `(see below).定义错误代码生成规则
 6. 静态`index.html` 支持. 静态首页访问
 7. 定制`Favicon`支持(see below). favicon.ico
@@ -513,7 +513,45 @@ public class DelegatingWebMvcConfiguration extends WebMvcConfigurationSupport {
 
 效果：SpringMVC的自动配置和我们的扩展配置都会起作用；
 
-### 3、全面接管SpringMVC;
+### 3、全面接管SpringMVC
+
+SpringBoot对SpringMVC的自动配置不需要了，所有都是我们自己配；所有的SpringMVC的自动配置都失效了
+
+**我们需要在配置类中添加@EnableWebMvc即可**
+
+原理：
+
+​	为什么添加了`@EnableWebMvc`，自动配置就失效了？
+
+1. `@EnableWebMvc`注解的核心
+
+```
+@Import({DelegatingWebMvcConfiguration.class})
+public @interface EnableWebMvc {
+```
+
+2.
+
+```
+@Configuration
+public class DelegatingWebMvcConfiguration extends WebMvcConfigurationSupport {
+```
+
+3.
+
+```
+@Configuration
+@ConditionalOnWebApplication
+@ConditionalOnClass({ Servlet.class, DispatcherServlet.class, WebMvcConfigurerAdapter.class })
+// 容器中没有这个组件的时候，这个自动配置类才生效
+@ConditionalOnMissingBean(WebMvcConfigurationSupport.class)
+@AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE + 10)
+@AutoConfigureAfter({ DispatcherServletAutoConfiguration.class, ValidationAutoConfiguration.class })
+public class WebMvcAutoConfiguration {
+```
+
+4. `@EnableWebMvc`将`WebMvcConfigurationSupport`组件导入进来
+5. 导入的`WebMvcConfigurationSupport`只是`SpringMVC`最基本的功能
 
 ## 如何修改SpringBoot的默认配置
 
@@ -531,7 +569,193 @@ public class DelegatingWebMvcConfiguration extends WebMvcConfigurationSupport {
 
 ### 1、默认访问首页
 
+```
+// 使用WebMvcConfigurerAdapter可以来扩展SpringMVC的功能
+// @EnableWebMvc   不要接管SpringMVC
+@Configuration
+public class MyMvcConfig extends WebMvcConfigurerAdapter {
+
+    @Override
+    public void addViewControllers(ViewControllerRegistry registry) {
+        // 浏览器发送 /fortunebill 请求来到 success
+        registry.addViewController("/fortunebill").setViewName("success");
+        // 设置登录页面
+        registry.addViewController("/").setViewName("login");
+        registry.addViewController("/index.html").setViewName("login");
+    }
+}
+```
+
 ### 2、国际化
+
+过去使用SpringMVC时的步骤
+
+1. 编写国际化配置文件
+2. 使用ResourceBundleMessageSource管理国际化资源文件
+3. 在页面使用fmt:message取出国际化内容
+
+使用SpringBoot的步骤
+
+1. 编写国际化配置文件，抽取页面需要显示的国际化消息
+
+```
+login.properties
+login.password=密码
+login.remember_me=记住我
+login.sign_in=注册
+login.tip=登录
+login.username=用户名
+
+login_en_US.properties
+login.password=Password
+login.remember_me=remember-me
+login.sign_in=Sign in
+login.tip=Please sign in
+login.username=Username
+
+
+login_zh_CN.properties
+login.password=密码
+login.remember_me=记住我
+login.sign_in=注册
+login.tip=登录
+login.username=用户名
+```
+
+
+
+1. SpringBoot自动配置好了管理国际化资源文件的组件
+
+```
+@ConfigurationProperties(prefix = "spring.messages")
+public class MessageSourceAutoConfiguration {
+    
+    /**
+     * Comma-separated list of basenames (essentially a fully-qualified classpath
+     * location), each following the ResourceBundle convention with relaxed support for
+     * slash based locations. If it doesn't contain a package qualifier (such as
+     * "org.mypackage"), it will be resolved from the classpath root.
+     */
+    private String basename = "messages";  
+    // 我们的配置文件可以直接放在类路径下叫messages.properties；
+    
+    @Bean
+    public MessageSource messageSource() {
+        ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
+        if (StringUtils.hasText(this.basename)) {
+            // 设置国际化资源文件的基础名（去掉语言国家代码的）
+            messageSource.setBasenames(StringUtils.commaDelimitedListToStringArray(
+                    StringUtils.trimAllWhitespace(this.basename)));
+        }
+        if (this.encoding != null) {
+            messageSource.setDefaultEncoding(this.encoding.name());
+        }
+        messageSource.setFallbackToSystemLocale(this.fallbackToSystemLocale);
+        messageSource.setCacheSeconds(this.cacheSeconds);
+        messageSource.setAlwaysUseMessageFormat(this.alwaysUseMessageFormat);
+        return messageSource;
+    }
+```
+
+3. 去页面获取国际化的值
+
+```
+spring.messages.basename=i18n/login
+```
+
+```
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<meta name="description" content="">
+		<meta name="author" content="">
+		<title>Signin Template for Bootstrap</title>
+		<!-- Bootstrap core CSS -->
+		<link href="asserts/css/bootstrap.min.css" th:href="@{/webjars/bootstrap/4.0.0/css/bootstrap.min.css}" rel="stylesheet">
+		<!-- Custom styles for this template -->
+		<link href="asserts/css/signin.css" th:href="@{/asserts/css/signin.css}" rel="stylesheet">
+	</head>
+
+	<body class="text-center">
+		<form class="form-signin" action="dashboard.html">
+			<img class="mb-4" src="asserts/img/bootstrap-solid.svg" th:src="@{/asserts/img/bootstrap-solid.svg}" alt="" width="72" height="72">
+			<h1 class="h3 mb-3 font-weight-normal" th:text="#{login.tip}"></h1>
+			<label class="sr-only">Username</label>
+			<input type="text" class="form-control" placeholder="Username" th:placeholder="#{login.username}" required="" autofocus="">
+			<label class="sr-only">Password</label>
+			<input type="password" class="form-control" placeholder="Password" th:placeholder="#{login.password}" required="">
+			<div class="checkbox mb-3">
+				<label>
+          <input type="checkbox" value="remember-me">[[#{login.remember_me}]]
+        </label>
+			</div>
+			<button class="btn btn-lg btn-primary btn-block" type="submit" th:text="#{login.sign_in}">Sign in</button>
+			<p class="mt-5 mb-3 text-muted">© 2017-2018</p>
+			<a class="btn btn-sm">中文</a>
+			<a class="btn btn-sm">English</a>
+		</form>
+
+	</body>
+
+</html>
+```
+
+效果：根据浏览器语言设置的信息切换了国际化
+
+原理：
+
+​	国际化Locale（区域信息对象）；LocaleResolver（获取区域信息对象）；
+
+```
+@Bean
+@ConditionalOnMissingBean
+@ConditionalOnProperty(prefix = "spring.mvc", name = "locale")
+public LocaleResolver localeResolver() {
+  if (this.mvcProperties.getLocaleResolver() == WebMvcProperties.LocaleResolver.FIXED) {
+    return new FixedLocaleResolver(this.mvcProperties.getLocale());
+  }
+  AcceptHeaderLocaleResolver localeResolver = new AcceptHeaderLocaleResolver();
+  localeResolver.setDefaultLocale(this.mvcProperties.getLocale());
+  return localeResolver;
+}
+默认的就是根据请求头带来的区域信息获取Locale进行国际化
+```
+
+4. 点击链接切换国际化
+
+```
+<a class="btn btn-sm" th:href="@{/index.html(l='zh_CN')}">中文</a>
+<a class="btn btn-sm" th:href="@{/index.html(l='en_US')}">English</a>
+
+/**
+ * 可以在连接上携带区域信息
+ */
+public class MyLocaleResolver implements LocaleResolver {
+    
+    @Override
+    public Locale resolveLocale(HttpServletRequest request) {
+        String l = request.getParameter("l");
+        Locale locale = Locale.getDefault();
+        if(!StringUtils.isEmpty(l)){
+            String[] split = l.split("_");
+            locale = new Locale(split[0],split[1]);
+        }
+        return locale;
+    }
+
+    @Override
+    public void setLocale(HttpServletRequest request, HttpServletResponse response, Locale locale) {
+
+    }
+}
+
+@Bean
+public LocaleResolver localeResolver(){
+    return new MyLocaleResolver();
+}
+```
 
 ### 3、登陆
 
