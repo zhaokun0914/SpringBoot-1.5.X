@@ -28,7 +28,7 @@ public class EmployeeDao {
 	
 	private static Integer initId = 1006;
 	
-	public void save(Employee employee){
+	public void saveOrUpdate(Employee employee){
 		if(employee.getId() == null){
 			employee.setId(initId++);
 		}

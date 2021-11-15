@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0052)http://getbootstrap.com/docs/4.0/examples/dashboard/ -->
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-
 <head>
     <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
     <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
@@ -76,16 +74,20 @@
                             <td th:text="${emp.email}"></td>
                             <td th:text="${emp.gender} == 0 ? '女' : '男'"></td>
                             <td th:text="${emp.department.departmentName}"></td>
-                            <td th:text="${#dates.format(emp.birth, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                            <td th:text="${#dates.format(emp.birth, 'yyyy-MM-dd')}"></td>
                             <td>
-                                <a class="btn btn-sm btn-primary">添加</a>
-                                <a class="btn btn-sm btn-danger">删除</a>
+                                <a class="btn btn-sm btn-primary" th:href="@{/emp/}+${emp.id}">编辑</a>
+                                <button th:attr="delete_uri=@{/emp/}+${emp.id}" type="submit" class="btn btn-sm btn-danger deleteBtn">删除</button>
+
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </main>
+        <form id="deleteForm" action="#"method="post">
+            <input type="hidden" name="_method" value="delete">
+        </form>
     </div>
 </div>
 

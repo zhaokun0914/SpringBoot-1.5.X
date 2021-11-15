@@ -6,8 +6,7 @@ import com.fortunebill.springboot.entities.Department;
 import com.fortunebill.springboot.entities.Employee;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 import java.util.Map;
@@ -49,8 +48,46 @@ public class EmployeeController {
      */
     @PostMapping("/emp")
     public String addEmp(Employee employee) {
-        employeeDao.save(employee);
+        employeeDao.saveOrUpdate(employee);
         // 来到员工列表页面，redirect:重定向到一个地址，forward:转发到一个地址
+        return "redirect:/emps";
+    }
+
+    /**
+     * 来到修改页面，查出当前员工，在页面回显
+     * @param id
+     * @param map
+     * @return
+     */
+    @GetMapping("/emp/{id}")
+    public String toEditEmp(@PathVariable("id") Integer id, Map<String, Object> map) {
+        Employee employee = employeeDao.get(id);
+        map.put("emp", employee);
+
+        Collection<Department> departments = departmentDao.getDepartments();
+        map.put("depts", departments);
+        return "emp/add";
+    }
+
+    /**
+     * 更新员工
+     * @param employee
+     * @return
+     */
+    @PutMapping("/emp")
+    public String updateEmployee(Employee employee) {
+        employeeDao.saveOrUpdate(employee);
+        return "redirect:/emps";
+    }
+
+    /**
+     * 员工删除
+     * @param id
+     * @return
+     */
+    @DeleteMapping("/emp/{id}")
+    public String deleteEmployee(@PathVariable("id") Integer id) {
+        employeeDao.delete(id);
         return "redirect:/emps";
     }
 
