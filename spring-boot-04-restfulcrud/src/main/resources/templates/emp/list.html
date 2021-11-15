@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <!-- saved from url=(0052)http://getbootstrap.com/docs/4.0/examples/dashboard/ -->
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
     <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
@@ -49,10 +50,41 @@
 <div class="container-fluid">
     <div class="row">
         <!-- 引入抽取的 sidebar -->
-        <div th:replace="/commons/bar :: #sidebar"></div>
+        <div th:replace="/commons/bar :: #sidebar(activeUri='emps')"></div>
 
         <main class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4" role="main">
-            <h1>404</h1>
+            <h2>
+                <button class="btn btn-sm btn-success">员工添加</button>
+            </h2>
+            <div class="table-responsive">
+                <table class="table table-striped table-sm">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>lastName</th>
+                        <th>email</th>
+                        <th>gender</th>
+                        <th>department</th>
+                        <th>birth</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="emp : ${emps}">
+                            <td th:text="*{emp.id}"></td>
+                            <td >[[${emp.lastName}]]</td>
+                            <td th:text="${emp.email}"></td>
+                            <td th:text="${emp.gender} == 0 ? '女' : '男'"></td>
+                            <td th:text="${emp.department.departmentName}"></td>
+                            <td th:text="${#dates.format(emp.birth, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                            <td>
+                                <button class="btn btn-sm btn-primary">添加</button>
+                                <button class="btn btn-sm btn-danger">删除</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </main>
     </div>
 </div>
@@ -60,7 +92,6 @@
 <!-- Bootstrap core JavaScript
 ================================================== -->
 <!-- 引入之后 -->
-<!-- Placed at the end of the document so the pages load faster -->
 <div th:include="/commons/script :: script"></div>
 
 </body>

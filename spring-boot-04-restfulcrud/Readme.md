@@ -203,7 +203,7 @@ th:任意html属性：来替换原生属性的值
 
 | 顺序 | 特性                    | 属性                                                         |
 | :--- | :---------------------- | :----------------------------------------------------------- |
-| 1    | 包含片段（jsp:include） | `th:insert`<br />`th:replace`                                |
+| 1    | 包含片段（jsp:include） | `th:insert`<br />`th:replace`<br />`th:include`              |
 | 2    | 迭代片段（c:forEach）   | `th:each`                                                    |
 | 3    | 条件计算（c:if）        | `th:if`<br />`th:unless`<br />`th:switch`<br />`th:case`     |
 | 4    | 局部变量定义（c:set）   | `th:object`<br />`th:with`                                   |
@@ -606,7 +606,6 @@ login.sign_in=注册
 login.tip=登录
 login.username=用户名
 
-
 login_en_US.properties
 login.password=Password
 login.remember_me=remember-me
@@ -630,12 +629,14 @@ login.username=用户名
 public class MessageSourceAutoConfiguration {
     
     /**
-     * 以逗号分隔的基本名称列表（本质上是一个完全限定的类路径位置），每个都遵循 ResourceBundle 约定，并宽松地支持基于斜杠的位置。
-     * 如果它不包含包限定符（例如“org.mypackage”），它将从类路径根目录解析。
+     * Comma-separated list of basenames (essentially a fully-qualified classpath
+     * location), each following the ResourceBundle convention with relaxed support for
+     * slash based locations. If it doesn't contain a package qualifier (such as
+     * "org.mypackage"), it will be resolved from the classpath root.
      */
     private String basename = "messages";  
-    // 我们的配置文件可以直接放在类路径下叫messages.properties的文件中；
-        
+    // 我们的配置文件可以直接放在类路径下叫messages.properties；
+    
     @Bean
     public MessageSource messageSource() {
         ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
@@ -707,7 +708,7 @@ spring.messages.basename=i18n/login
 
 ```
 @Bean
-@ConditionalOnMissingBean // 如果容器中没有 LocaleResolver 这个bean则配置这个组件，否则用用户配置的 LocaleResolver
+@ConditionalOnMissingBean
 @ConditionalOnProperty(prefix = "spring.mvc", name = "locale")
 public LocaleResolver localeResolver() {
   if (this.mvcProperties.getLocaleResolver() == WebMvcProperties.LocaleResolver.FIXED) {
@@ -773,6 +774,8 @@ spring.thymeleaf.cache=false
 <p style="color: red" th:text="${msg}" th:if="${not #strings.isEmpty(msg)}"></p>
 ```
 
+
+
 ### 4、拦截器进行登陆检查
 
 拦截器
@@ -836,7 +839,7 @@ public class MyMvcConfig extends WebMvcConfigurerAdapter {
 
 1. **RestfulCRUD：CRUD满足Rest风格**
 
-URI：  /资源名称/资源标识       HTTP请求方式区分对资源CRUD操作
+URI：/资源名称/资源标识  ->  HTTP请求方式区分对资源CRUD操作
 
 |      | 普通CRUD（uri来区分操作） | RestfulCRUD       |
 | ---- | ------------------------- | ----------------- |
@@ -934,7 +937,7 @@ insert的公共片段在div标签中
                 </a>
             </li>
 
-<!--引入侧边栏;传入参数-->
+<!--引入侧边栏时传入参数-->
 <div th:replace="commons/bar::#sidebar(activeUri='emps')"></div>
 ```
 
