@@ -1,10 +1,12 @@
 package com.fortunebill.springboot.config;
 
 import com.fortunebill.springboot.MyLocaleResolver;
+import com.fortunebill.springboot.component.LoginHandlerIntercepter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
@@ -21,6 +23,18 @@ public class MyMvcConfig extends WebMvcConfigurerAdapter {
         registry.addViewController("/fortunebill").setViewName("success");
         registry.addViewController("/").setViewName("login");
         registry.addViewController("/index.html").setViewName("login");
+        registry.addViewController("/main.html").setViewName("dashboard");
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new LoginHandlerIntercepter())
+                // 该拦截器拦截所有请求
+                .addPathPatterns("/**")
+                // 排除以下请求
+                .excludePathPatterns("/")
+                .excludePathPatterns("/index.html")
+                .excludePathPatterns("/user/login");
     }
 
     @Bean
