@@ -382,13 +382,13 @@ Spring Boot 自动配置好了SpringMVC
 以下是SpringBoot对SpringMVC的默认配置:（`WebMvcAutoConfiguration`）
 
 1. 包含`ContentNegotiatingViewResolver` 和 `BeanNameViewResolver` beans.
-   - 自动配置了ViewResolver（视图解析器：根据方法的返回值得到视图对象（View），视图对象决定如何渲染（转发？重定向？））
-   - `ContentNegotiatingViewResolver`：组合所有的视图解析器的；
-   - 如何定制？：我们可以自己给容器中添加一个视图解析器；自动的将其组合进来；
+    - 自动配置了ViewResolver（视图解析器：根据方法的返回值得到视图对象（View），视图对象决定如何渲染（转发？重定向？））
+    - `ContentNegotiatingViewResolver`：组合所有的视图解析器的；
+    - 如何定制？：我们可以自己给容器中添加一个视图解析器；自动的将其组合进来；
 2. 支持提供静态资源，包括对 WebJars 的支持（见下文）.静态资源文件夹路径，webjars
 3. 自动注册了`Converter `, `GenericConverter `, `Formatter` beans.
-   - Converter：转换器； public String hello(User user)：类型转换使用Converter
-   - `Formatter `格式化器； 2017.12.17===Date；
+    - Converter：转换器； public String hello(User user)：类型转换使用Converter
+    - `Formatter `格式化器； 2017.12.17===Date；
 
 ```
 @Bean
@@ -401,9 +401,9 @@ public Formatter<Date> dateFormatter() {
 自己添加的格式化器转换器，我们只需要放在容器中即可
 
 4. 支持 `HttpMessageConverters `(see below).
-   - `HttpMessageConverter`：SpringMVC用来转换Http请求和响应的；User---Json；
-   - `HttpMessageConverters `是从容器中确定；获取所有的`HttpMessageConverter`；
-     自己给容器中添加`HttpMessageConverter`，只需要将自己的组件注册到容器中（@Bean、@Component）
+    - `HttpMessageConverter`：SpringMVC用来转换Http请求和响应的；User---Json；
+    - `HttpMessageConverters `是从容器中确定；获取所有的`HttpMessageConverter`；
+      自己给容器中添加`HttpMessageConverter`，只需要将自己的组件注册到容器中（@Bean、@Component）
 5. 自动注册 `MessageCodesResolver `(see below).定义错误代码生成规则
 6. 静态`index.html` 支持. 静态首页访问
 7. 定制`Favicon`支持(see below). favicon.ico
@@ -521,7 +521,7 @@ SpringBoot对SpringMVC的自动配置不需要了，所有都是我们自己配�
 
 原理：
 
-​	为什么添加了`@EnableWebMvc`，自动配置就失效了？
+	为什么添加了`@EnableWebMvc`，自动配置就失效了？
 
 1. `@EnableWebMvc`注解的核心
 
@@ -559,7 +559,7 @@ public class WebMvcAutoConfiguration {
 
 1、Spring Boot在自动配置很多组件的时候，先看容器中有没有用户配置的（@Bean、@Component）如果有就用用户配置的，如果没有，才自动配置。
 
-​    如果有些组件可以有多个（ViewResolver）将用户配置的和自己默认的组合起来。
+    如果有些组件可以有多个（例如：ViewResolver），SpringBoot会将用户配置的和SpringBoot默认的组合起来。
 
 2、在SpringBoot中会有非常多的xxxConfigurer帮助我们进行扩展配置
 
@@ -606,6 +606,7 @@ login.sign_in=注册
 login.tip=登录
 login.username=用户名
 
+
 login_en_US.properties
 login.password=Password
 login.remember_me=remember-me
@@ -622,23 +623,19 @@ login.tip=登录
 login.username=用户名
 ```
 
-
-
-1. SpringBoot自动配置好了管理国际化资源文件的组件
+2. SpringBoot自动配置好了管理国际化资源文件的组件
 
 ```
 @ConfigurationProperties(prefix = "spring.messages")
 public class MessageSourceAutoConfiguration {
     
     /**
-     * Comma-separated list of basenames (essentially a fully-qualified classpath
-     * location), each following the ResourceBundle convention with relaxed support for
-     * slash based locations. If it doesn't contain a package qualifier (such as
-     * "org.mypackage"), it will be resolved from the classpath root.
+     * 以逗号分隔的基本名称列表（本质上是一个完全限定的类路径位置），每个都遵循 ResourceBundle 约定，并宽松地支持基于斜杠的位置。
+     * 如果它不包含包限定符（例如“org.mypackage”），它将从类路径根目录解析。
      */
     private String basename = "messages";  
-    // 我们的配置文件可以直接放在类路径下叫messages.properties；
-    
+    // 我们的配置文件可以直接放在类路径下叫messages.properties的文件中；
+        
     @Bean
     public MessageSource messageSource() {
         ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
@@ -706,11 +703,11 @@ spring.messages.basename=i18n/login
 
 原理：
 
-​	国际化Locale（区域信息对象）；LocaleResolver（获取区域信息对象）；
+	国际化Locale（区域信息对象）；LocaleResolver（获取区域信息对象）；
 
 ```
 @Bean
-@ConditionalOnMissingBean
+@ConditionalOnMissingBean // 如果容器中没有 LocaleResolver 这个bean则配置这个组件，否则用用户配置的 LocaleResolver
 @ConditionalOnProperty(prefix = "spring.mvc", name = "locale")
 public LocaleResolver localeResolver() {
   if (this.mvcProperties.getLocaleResolver() == WebMvcProperties.LocaleResolver.FIXED) {
@@ -759,11 +756,187 @@ public LocaleResolver localeResolver(){
 
 ### 3、登陆
 
+开发期间模板引擎页面修改以后，要实时生效
+
+1. 禁用模板引擎的缓存
+
+```
+# 禁用缓存
+spring.thymeleaf.cache=false 
+```
+
+2. 页面修改完成以后ctrl+f9：重新编译；
+
+登陆错误消息的显示
+
+```
+<p style="color: red" th:text="${msg}" th:if="${not #strings.isEmpty(msg)}"></p>
+```
+
 ### 4、拦截器进行登陆检查
+
+拦截器
+
+```
+/**
+ * 登录检查
+ */
+public class LoginHandlerInterceptor implements HandlerInterceptor {
+
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        Object loginUser = request.getSession().getAttribute("loginUser");
+        if (loginUser == null) {
+            request.setAttribute("msg", "当前没有权限，请登录");
+            request.getRequestDispatcher("/index.html").forward(request, response);
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+
+    }
+}
+
+```
+
+注册拦截器
+
+```
+/**
+ * Spring Boot 配置文件
+ */
+@Configuration
+public class MyMvcConfig extends WebMvcConfigurerAdapter {
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new LoginHandlerInterceptor())
+                // 该拦截器拦截所有请求
+                // 对于静态资源：*.css , *.js等，SpringBoot已经做好了静态资源映射
+                .addPathPatterns("/**")
+                // 排除以下请求
+                .excludePathPatterns("/")             // 主页跳转
+                .excludePathPatterns("/index.html")   // 主页跳转
+                .excludePathPatterns("/user/login");  // 登录请求
+    }
+}
+```
 
 ### 5、CRUD-员工列表
 
-​	thymeleaf公共页面元素抽取
+实验要求：
+
+1. **RestfulCRUD：CRUD满足Rest风格**
+
+URI：  /资源名称/资源标识       HTTP请求方式区分对资源CRUD操作
+
+|      | 普通CRUD（uri来区分操作） | RestfulCRUD       |
+| ---- | ------------------------- | ----------------- |
+| 查询 | getEmp                    | emp---GET         |
+| 添加 | addEmp?xxx                | emp---POST        |
+| 修改 | updateEmp?id=xxx&xxx=xx   | emp/{id}---PUT    |
+| 删除 | deleteEmp?id=1            | emp/{id}---DELETE |
+
+2. **实验的请求架构**
+
+| 实验功能                             | 请求URI | 请求方式 |
+| ------------------------------------ | ------- | -------- |
+| 查询所有员工                         | emps    | GET      |
+| 查询某个员工(来到修改页面)           | emp/1   | GET      |
+| 来到添加页面                         | emp     | GET      |
+| 添加员工                             | emp     | POST     |
+| 来到修改页面（查出员工进行信息回显） | emp/1   | GET      |
+| 修改员工                             | emp     | PUT      |
+| 删除员工                             | emp/1   | DELETE   |
+
+2. **员工列表**
+
+thymeleaf公共页面元素抽取
+
+```
+1、抽取公共片段
+<div th:fragment="copy">
+    &copy; 2011 The Good Thymes Virtual Grocery
+</div>
+
+2、引入公共片段
+<div th:insert="~{footer :: copy}"></div>
+~{templatename::selector}：模板名::选择器
+~{templatename::fragmentname}:模板名::片段名
+
+3、默认效果：
+insert的公共片段在div标签中
+如果使用th:insert等属性进行引入，可以不用写~{}：
+行内写法可以加上：[[~{}]];[(~{})]；
+```
+
+3. **三种引入公共片段的th属性**
+
+**th:insert**：将公共片段整个插入到声明引入的元素中
+
+**th:replace**：将声明引入的元素替换为公共片段
+
+**th:include**：将被引入的片段的内容包含进这个标签中
+
+```
+<footer th:fragment="copy">
+    &copy; 2011 The Good Thymes Virtual Grocery
+</footer>
+
+<!--引入方式-->
+<div th:insert="footer :: copy"></div>
+<div th:replace="footer :: copy"></div>
+<div th:include="footer :: copy"></div>
+
+<!-- insert 效果-->
+<div>
+    <footer>
+        &copy; 2011 The Good Thymes Virtual Grocery
+    </footer>
+</div>
+
+<!-- replace 效果-->
+<footer>
+    &copy; 2011 The Good Thymes Virtual Grocery
+</footer>
+
+<!-- include 效果-->
+<div>
+    &copy; 2011 The Good Thymes Virtual Grocery
+</div>
+```
+
+4. **引入片段的时候传入参数**
+
+```
+<nav class="col-md-2 d-none d-md-block bg-light sidebar" id="sidebar">
+    <div class="sidebar-sticky">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link active"
+                   th:class="${activeUri=='main.html'?'nav-link active':'nav-link'}"
+                   href="#" th:href="@{/main.html}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                         class="feather feather-home">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                    Dashboard <span class="sr-only">(current)</span>
+                </a>
+            </li>
+
+<!--引入侧边栏;传入参数-->
+<div th:replace="commons/bar::#sidebar(activeUri='emps')"></div>
+```
 
 ### 6、CRUD-员工添加
 

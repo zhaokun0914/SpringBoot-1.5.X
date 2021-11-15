@@ -1,4 +1,4 @@
-package com.fortunebill.springboot;
+package com.fortunebill.springboot.component;
 
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.LocaleResolver;

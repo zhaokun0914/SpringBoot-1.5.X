@@ -1,11 +1,10 @@
 package com.fortunebill.springboot.config;
 
-import com.fortunebill.springboot.MyLocaleResolver;
-import com.fortunebill.springboot.component.LoginHandlerIntercepter;
+import com.fortunebill.springboot.component.MyLocaleResolver;
+import com.fortunebill.springboot.component.LoginHandlerInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.LocaleResolver;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
@@ -28,7 +27,7 @@ public class MyMvcConfig extends WebMvcConfigurerAdapter {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new LoginHandlerIntercepter())
+        registry.addInterceptor(new LoginHandlerInterceptor())
                 // 该拦截器拦截所有请求
                 .addPathPatterns("/**")
                 // 排除以下请求
@@ -42,3 +41,4 @@ public class MyMvcConfig extends WebMvcConfigurerAdapter {
         return new MyLocaleResolver();
     }
 }
+
