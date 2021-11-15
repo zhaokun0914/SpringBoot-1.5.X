@@ -1,8 +1,13 @@
 package com.fortunebill.springboot.entities;
 
+/**
+ * @author Kavin
+ * @date 2021年11月15日14:58:30
+ */
 public class Department {
 
 	private Integer id;
+
 	private String departmentName;
 
 	public Department() {

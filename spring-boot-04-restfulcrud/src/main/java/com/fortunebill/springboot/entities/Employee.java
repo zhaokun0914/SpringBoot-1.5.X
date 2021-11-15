@@ -2,16 +2,36 @@ package com.fortunebill.springboot.entities;
 
 import java.util.Date;
 
+/**
+ * @author Kavin
+ * @date 2021年11月15日14:58:30
+ */
 public class Employee {
 
-	private Integer id;
+    private Integer id;
+
     private String lastName;
 
     private String email;
+
     //1 male, 0 female
     private Integer gender;
+
     private Department department;
+
     private Date birth;
+
+    public Employee() {
+    }
+
+    public Employee(Integer id, String lastName, String email, Integer gender, Department department) {
+        this.id = id;
+        this.lastName = lastName;
+        this.email = email;
+        this.gender = gender;
+        this.department = department;
+        this.birth = new Date();
+    }
 
     public Integer getId() {
         return id;
@@ -60,19 +80,6 @@ public class Employee {
     public void setBirth(Date birth) {
         this.birth = birth;
     }
-    public Employee(Integer id, String lastName, String email, Integer gender,
-                    Department department) {
-        super();
-        this.id = id;
-        this.lastName = lastName;
-        this.email = email;
-        this.gender = gender;
-        this.department = department;
-        this.birth = new Date();
-    }
-
-    public Employee() {
-    }
 
     @Override
     public String toString() {
@@ -85,6 +92,6 @@ public class Employee {
                 ", birth=" + birth +
                 '}';
     }
-	
-	
+
+
 }

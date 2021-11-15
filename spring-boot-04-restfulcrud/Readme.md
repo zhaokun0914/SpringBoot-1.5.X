@@ -943,6 +943,44 @@ insert的公共片段在div标签中
 
 ### 6、CRUD-员工添加
 
+添加页面
+
+```
+<form th:action="@{/emp}" method="post">
+    <div class="form-group">
+        <label>LastName</label>
+        <input type="text" name="lastName" class="form-control" placeholder="zhangsan">
+    </div>
+    <div class="form-group">
+        <label>Email</label>
+        <input type="email" name="email" class="form-control" placeholder="zhangsan@atguigu.com">
+    </div>
+    <div class="form-group">
+        <label>Gender</label><br/>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="gender"  value="1">
+            <label class="form-check-label">男</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="gender"  value="0">
+            <label class="form-check-label">女</label>
+        </div>
+    </div>
+    <div class="form-group">
+        <label>department</label>
+        <select class="form-control" name="department.id">
+            <!-- 提交的是部门的id -->
+            <option th:each="dept : ${depts}" th:value="*{dept.id}" th:text="*{dept.departmentName}"></option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label>Birth</label>
+        <input type="text" name="birth" class="form-control" placeholder="zhangsan">
+    </div>
+    <button type="submit" class="btn btn-primary">添加</button>
+</form>
+```
+
 ### 7、CRUD-员工修改
 
 ### 8、CRUD-员工删除

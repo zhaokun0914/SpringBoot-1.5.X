@@ -53,14 +53,14 @@
         <div th:replace="/commons/bar :: #sidebar(activeUri='emps')"></div>
 
         <main class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4" role="main">
-            <form>
+            <form th:action="@{/emp}" method="post">
                 <div class="form-group">
                     <label>LastName</label>
-                    <input type="text" class="form-control" placeholder="zhangsan">
+                    <input type="text" name="lastName" class="form-control" placeholder="zhangsan">
                 </div>
                 <div class="form-group">
                     <label>Email</label>
-                    <input type="email" class="form-control" placeholder="zhangsan@atguigu.com">
+                    <input type="email" name="email" class="form-control" placeholder="zhangsan@atguigu.com">
                 </div>
                 <div class="form-group">
                     <label>Gender</label><br/>
@@ -75,14 +75,14 @@
                 </div>
                 <div class="form-group">
                     <label>department</label>
-                    <select class="form-control">
+                    <select class="form-control" name="department.id">
                         <!-- 提交的是部门的id -->
                         <option th:each="dept : ${depts}" th:value="*{dept.id}" th:text="*{dept.departmentName}"></option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label>Birth</label>
-                    <input type="text" class="form-control" placeholder="zhangsan">
+                    <input type="text" name="birth" class="form-control" placeholder="zhangsan">
                 </div>
                 <button type="submit" class="btn btn-primary">添加</button>
             </form>

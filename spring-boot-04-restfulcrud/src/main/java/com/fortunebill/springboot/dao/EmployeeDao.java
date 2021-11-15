@@ -1,13 +1,11 @@
 package com.fortunebill.springboot.dao;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.fortunebill.springboot.entities.Department;
 import com.fortunebill.springboot.entities.Employee;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
+import java.util.*;
 
 
 @Repository
@@ -19,7 +17,7 @@ public class EmployeeDao {
 	private DepartmentDao departmentDao;
 	
 	static{
-		employees = new HashMap<Integer, Employee>();
+		employees = new HashMap<>();
 
 		employees.put(1001, new Employee(1001, "E-AA", "aa@163.com", 1, new Department(101, "D-AA")));
 		employees.put(1002, new Employee(1002, "E-BB", "bb@163.com", 1, new Department(102, "D-BB")));
