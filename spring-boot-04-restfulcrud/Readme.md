@@ -382,13 +382,13 @@ Spring Boot 自动配置好了SpringMVC
 以下是SpringBoot对SpringMVC的默认配置:（`WebMvcAutoConfiguration`）
 
 1. 包含`ContentNegotiatingViewResolver` 和 `BeanNameViewResolver` beans.
-    - 自动配置了ViewResolver（视图解析器：根据方法的返回值得到视图对象（View），视图对象决定如何渲染（转发？重定向？））
-    - `ContentNegotiatingViewResolver`：组合所有的视图解析器的；
-    - 如何定制？：我们可以自己给容器中添加一个视图解析器；自动的将其组合进来；
+   - 自动配置了ViewResolver（视图解析器：根据方法的返回值得到视图对象（View），视图对象决定如何渲染（转发？重定向？））
+   - `ContentNegotiatingViewResolver`：组合所有的视图解析器的；
+   - 如何定制？：我们可以自己给容器中添加一个视图解析器；自动的将其组合进来；
 2. 支持提供静态资源，包括对 WebJars 的支持（见下文）.静态资源文件夹路径，webjars
 3. 自动注册了`Converter `, `GenericConverter `, `Formatter` beans.
-    - Converter：转换器； public String hello(User user)：类型转换使用Converter
-    - `Formatter `格式化器； 2017.12.17===Date；
+   - Converter：转换器； public String hello(User user)：类型转换使用Converter
+   - `Formatter `格式化器； 2017.12.17===Date；
 
 ```
 @Bean
@@ -401,9 +401,9 @@ public Formatter<Date> dateFormatter() {
 自己添加的格式化器转换器，我们只需要放在容器中即可
 
 4. 支持 `HttpMessageConverters `(see below).
-    - `HttpMessageConverter`：SpringMVC用来转换Http请求和响应的；User---Json；
-    - `HttpMessageConverters `是从容器中确定；获取所有的`HttpMessageConverter`；
-      自己给容器中添加`HttpMessageConverter`，只需要将自己的组件注册到容器中（@Bean、@Component）
+   - `HttpMessageConverter`：SpringMVC用来转换Http请求和响应的；User---Json；
+   - `HttpMessageConverters `是从容器中确定；获取所有的`HttpMessageConverter`；
+     自己给容器中添加`HttpMessageConverter`，只需要将自己的组件注册到容器中（@Bean、@Component）
 5. 自动注册 `MessageCodesResolver `(see below).定义错误代码生成规则
 6. 静态`index.html` 支持. 静态首页访问
 7. 定制`Favicon`支持(see below). favicon.ico
@@ -1064,6 +1064,110 @@ insert的公共片段在div标签中
 
 ### 1、SpringBoot默认的错误处理机制
 
+默认效果：
+
+1. 浏览器，返回一个默认的错误页面
+2. 如果是其他客户端，默认响应一个json数据
+
+原理：
+
+可以参照ErrorMvcAutoConfiguration，错误处理的自动配置，给容器中添加了以下组件
+
+1. DefaultErrorAttributes
+
+```
+@Override
+public Map<String, Object> getErrorAttributes(RequestAttributes requestAttributes, boolean includeStackTrace) {
+    Map<String, Object> errorAttributes = new LinkedHashMap<>();
+    errorAttributes.put("timestamp", new Date());
+    addStatus(errorAttributes, requestAttributes);
+    addErrorDetails(errorAttributes, requestAttributes, includeStackTrace);
+    addPath(errorAttributes, requestAttributes);
+    return errorAttributes;
+}
+```
+
+2. BasicErrorController：处理默认/error请求
+
+```
+@Controller
+@RequestMapping("${server.error.path:${error.path:/error}}")
+public class BasicErrorController extends AbstractErrorController {
+
+    @RequestMapping(produces = "text/html")//产生html类型的数据；浏览器发送的请求来到这个方法处理
+    public ModelAndView errorHtml(HttpServletRequest request, HttpServletResponse response) {
+        HttpStatus status = getStatus(request);
+        Map<String, Object> model = Collections.unmodifiableMap(getErrorAttributes(request, isIncludeStackTrace(request, MediaType.TEXT_HTML)));
+        response.setStatus(status.value());
+
+        //去哪个页面作为错误页面；包含页面地址和页面内容
+        ModelAndView modelAndView = resolveErrorView(request, response, status, model);
+        return (modelAndView == null ? new ModelAndView("error", model) : modelAndView);
+    }
+
+    @RequestMapping
+    @ResponseBody    //产生json数据，其他客户端来到这个方法处理；
+    public ResponseEntity<Map<String, Object>> error(HttpServletRequest request) {
+        Map<String, Object> body = getErrorAttributes(request, isIncludeStackTrace(request, MediaType.ALL));
+        HttpStatus status = getStatus(request);
+        return new ResponseEntity<>(body, status);
+    }
+}
+```
+
+3. ErrorPageCustomizer
+
+```
+@Value("${error.path:/error}")
+private String path = "/error";  系统出现错误以后来到error请求进行处理；（web.xml注册的错误页面规则）
+```
+
+4. DefaultErrorViewResolver
+
+```
+@Override
+public ModelAndView resolveErrorView(HttpServletRequest request, HttpStatus status, Map<String, Object> model) {
+    ModelAndView modelAndView = resolve(String.valueOf(status), model);
+    if (modelAndView == null && SERIES_VIEWS.containsKey(status.series())) {
+        modelAndView = resolve(SERIES_VIEWS.get(status.series()), model);
+    }
+    return modelAndView;
+}
+
+private ModelAndView resolve(String viewName, Map<String, Object> model) {
+    //默认SpringBoot可以去找到一个页面？  error/404
+    String errorViewName = "error/" + viewName;
+
+    //模板引擎可以解析这个页面地址就用模板引擎解析
+    TemplateAvailabilityProvider provider = this.templateAvailabilityProviders.getProvider(errorViewName, this.applicationContext);
+    if (provider != null) {
+        //模板引擎可用的情况下返回到errorViewName指定的视图地址
+        return new ModelAndView(errorViewName, model);
+    }
+    //模板引擎不可用，就在静态资源文件夹下找errorViewName对应的页面   error/404.html
+    return resolveResource(errorViewName, model);
+}
+```
+
+步骤：
+
+一但系统出现4xx或者5xx之类的错误；ErrorPageCustomizer就会生效（定制错误的响应规则）；就会来到/error请求；就会被**BasicErrorController**处理；
+
+1. 响应页面；去哪个页面是由**DefaultErrorViewResolver**解析得到的；
+
+```
+protected ModelAndView resolveErrorView(HttpServletRequest request, HttpServletResponse response, HttpStatus status, Map<String, Object> model) {
+    //所有的ErrorViewResolver得到ModelAndView
+   for (ErrorViewResolver resolver : this.errorViewResolvers) {
+      ModelAndView modelAndView = resolver.resolveErrorView(request, status, model);
+      if (modelAndView != null) {
+         return modelAndView;
+      }
+   }
+   return null;
+}
+```
+
 ### 2、如果定制错误响应
 
 #### 	1、如何定制错误的页面
@@ -1089,3 +1193,4 @@ insert的公共片段在div标签中
 ### 1、步骤
 
 ### 2、原理
+
