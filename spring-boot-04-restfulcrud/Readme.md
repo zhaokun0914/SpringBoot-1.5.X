@@ -1492,11 +1492,11 @@ public class EmbeddedServletContainerAutoConfiguration {
    }
    ```
 
-   ![搜狗截图20180302144835](D:\MyCode\springboot1\spring-boot-04-restfulcrud\pic\image-20211116193305.png)
+   ![搜狗截图20180302144835](pic/image-20211116193305.png)
 
 2. EmbeddedServletContainer：（嵌入式的Servlet容器）
 
-   ![搜狗截图20180302144910](D:\MyCode\springboot1\spring-boot-04-restfulcrud\pic\image-20211116193408.png)
+   ![搜狗截图20180302144910](pic/image-20211116193408.png)
 
 3. 以**TomcatEmbeddedServletContainerFactory**为例
 
