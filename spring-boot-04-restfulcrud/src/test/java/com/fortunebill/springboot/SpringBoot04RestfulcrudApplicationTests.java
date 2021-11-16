@@ -8,6 +8,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.converter.GenericConverter;
 import org.springframework.format.Formatter;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit4.SpringRunner;
 
 
@@ -20,12 +21,7 @@ public class SpringBoot04RestfulcrudApplicationTests {
 
     @Test
     public void test() {
-        String[] Converter = context.getBeanNamesForType(Converter.class);
-        System.out.println(Converter.length);
-        String[] GenericConverter = context.getBeanNamesForType(GenericConverter.class);
-        System.out.println(GenericConverter.length);
-        String[] Formatter = context.getBeanNamesForType(Formatter.class);
-        System.out.println(Formatter.length);
+        HttpStatus status = HttpStatus.NOT_ACCEPTABLE;
+        System.out.println(status);
     }
-
 }

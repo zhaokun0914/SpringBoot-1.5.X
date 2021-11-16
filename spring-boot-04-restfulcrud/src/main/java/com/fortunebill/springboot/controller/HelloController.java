@@ -1,5 +1,6 @@
 package com.fortunebill.springboot.controller;
 
+import com.fortunebill.springboot.exception.UserNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,8 +19,10 @@ public class HelloController {
 
     @RequestMapping("hello")
     @ResponseBody
-    public String heelo() {
-        log.info("==> 进入hello 方法了");
+    public String hello(String username) {
+        if ("aaa".equals(username)) {
+            throw new UserNotFoundException();
+        }
         return "Hello World";
     }
 

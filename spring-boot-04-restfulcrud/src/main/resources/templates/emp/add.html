@@ -57,7 +57,7 @@
                 <!--
                     1、SpringMVC中配置HiddenHttpMethodFilter;（SpringBoot自动配置好的）
                     2、页面创建一个post表单
-                    3、创建一个input项，name="_method";value 就是我们指定的请求方式
+                    3、创建一个input项，type="hidden";name="_method";value 就是我们指定的请求方式
                 -->
                 <input type="hidden" name="_method" value="put" th:if="${emp != null}">
                 <input type="hidden" name="id" th:value="${emp.id}" th:if="${emp != null}">
@@ -105,4 +105,13 @@
 
 </body>
 
+</html>
+<html>
+    <body>
+        <h1>Whitelabel Error Page</h1>
+        <p>This application has no explicit mapping for /error, so you are seeing this as a fallback.</p>
+        <div id='created'>${timestamp}</div>
+        <div>There was an unexpected error (type=${error}, status=${status}).</div>
+        <div>${message}</div>
+    </body>
 </html>

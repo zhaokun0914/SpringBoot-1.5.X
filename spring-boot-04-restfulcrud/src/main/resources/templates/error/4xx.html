@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+    <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
+    <meta content="" name="description">
+    <meta content="" name="author">
+
+    <title>Dashboard Template for Bootstrap</title>
+    <!-- Bootstrap core CSS -->
+    <link href="../../static/asserts/css/bootstrap.min.css" rel="stylesheet"
+          th:href="@{/webjars/bootstrap/4.0.0/css/bootstrap.min.css}">
+
+    <!-- Custom styles for this template -->
+    <link href="../../static/asserts/css/dashboard.css" rel="stylesheet" th:href="@{/asserts/css/dashboard.css}">
+    <style type="text/css">
+        /* Chart.js */
+
+        @-webkit-keyframes chartjs-render-animation {
+            from {
+                opacity: 0.99
+            }
+            to {
+                opacity: 1
+            }
+        }
+
+        @keyframes chartjs-render-animation {
+            from {
+                opacity: 0.99
+            }
+            to {
+                opacity: 1
+            }
+        }
+
+        .chartjs-render-monitor {
+            -webkit-animation: chartjs-render-animation 0.001s;
+            animation: chartjs-render-animation 0.001s;
+        }
+    </style>
+</head>
+
+<body>
+<!-- 引入抽取的 topbar -->
+<div th:replace="/commons/bar :: topbar"></div>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- 引入抽取的 sidebar -->
+        <div th:replace="/commons/bar :: #sidebar"></div>
+
+        <main class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4" role="main">
+            <h1>4xx</h1>
+            <h1>timestamp=>[[${timestamp}]]</h1>
+            <h1>status=>[[${status}]]</h1>
+            <h1>error=>[[${error}]]</h1>
+            <h1>exception=>[[${exception}]]</h1>
+            <h1>message=>[[${message}]]</h1>
+            <h1>ext.message=>[[${ext.message}]]</h1>
+            <h1>ext.code=>[[${ext.code}]]</h1>
+            <h1>errors=>[[${errors}]]</h1>
+        </main>
+    </div>
+</div>
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- 引入之后 -->
+<!-- Placed at the end of the document so the pages load faster -->
+<div th:include="/commons/script :: script"></div>
+
+</body>
+
+</html>

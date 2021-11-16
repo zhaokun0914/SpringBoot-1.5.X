@@ -25,16 +25,16 @@ public class MyMvcConfig extends WebMvcConfigurerAdapter {
         registry.addViewController("/main.html").setViewName("dashboard");
     }
 
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new LoginHandlerInterceptor())
-                // 该拦截器拦截所有请求
-                .addPathPatterns("/**")
-                // 排除以下请求
-                .excludePathPatterns("/")
-                .excludePathPatterns("/index.html")
-                .excludePathPatterns("/user/login");
-    }
+    // @Override
+    // public void addInterceptors(InterceptorRegistry registry) {
+    //     registry.addInterceptor(new LoginHandlerInterceptor())
+    //             // 该拦截器拦截所有请求
+    //             .addPathPatterns("/**")
+    //             // 排除以下请求
+    //             .excludePathPatterns("/")
+    //             .excludePathPatterns("/index.html")
+    //             .excludePathPatterns("/user/login");
+    // }
 
     @Bean
     public LocaleResolver localeResolver() {

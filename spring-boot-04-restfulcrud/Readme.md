@@ -382,13 +382,13 @@ Spring Boot 自动配置好了SpringMVC
 以下是SpringBoot对SpringMVC的默认配置:（`WebMvcAutoConfiguration`）
 
 1. 包含`ContentNegotiatingViewResolver` 和 `BeanNameViewResolver` beans.
-   - 自动配置了ViewResolver（视图解析器：根据方法的返回值得到视图对象（View），视图对象决定如何渲染（转发？重定向？））
-   - `ContentNegotiatingViewResolver`：组合所有的视图解析器的；
-   - 如何定制？：我们可以自己给容器中添加一个视图解析器；自动的将其组合进来；
+    - 自动配置了ViewResolver（视图解析器：根据方法的返回值得到视图对象（View），视图对象决定如何渲染（转发？重定向？））
+    - `ContentNegotiatingViewResolver`：组合所有的视图解析器的；
+    - 如何定制？：我们可以自己给容器中添加一个视图解析器；自动的将其组合进来；
 2. 支持提供静态资源，包括对 WebJars 的支持（见下文）.静态资源文件夹路径，webjars
 3. 自动注册了`Converter `, `GenericConverter `, `Formatter` beans.
-   - Converter：转换器； public String hello(User user)：类型转换使用Converter
-   - `Formatter `格式化器； 2017.12.17===Date；
+    - Converter：转换器； public String hello(User user)：类型转换使用Converter
+    - `Formatter `格式化器； 2017.12.17===Date；
 
 ```
 @Bean
@@ -401,9 +401,9 @@ public Formatter<Date> dateFormatter() {
 自己添加的格式化器转换器，我们只需要放在容器中即可
 
 4. 支持 `HttpMessageConverters `(see below).
-   - `HttpMessageConverter`：SpringMVC用来转换Http请求和响应的；User---Json；
-   - `HttpMessageConverters `是从容器中确定；获取所有的`HttpMessageConverter`；
-     自己给容器中添加`HttpMessageConverter`，只需要将自己的组件注册到容器中（@Bean、@Component）
+    - `HttpMessageConverter`：SpringMVC用来转换Http请求和响应的；User---Json；
+    - `HttpMessageConverters `是从容器中确定；获取所有的`HttpMessageConverter`；
+      自己给容器中添加`HttpMessageConverter`，只需要将自己的组件注册到容器中（@Bean、@Component）
 5. 自动注册 `MessageCodesResolver `(see below).定义错误代码生成规则
 6. 静态`index.html` 支持. 静态首页访问
 7. 定制`Favicon`支持(see below). favicon.ico
@@ -1002,7 +1002,7 @@ insert的公共片段在div标签中
     <!--
         1、SpringMVC中配置HiddenHttpMethodFilter;（SpringBoot自动配置好的）
         2、页面创建一个post表单
-        3、创建一个input项，name="_method";value 就是我们指定的请求方式
+        3、创建一个input项，type="hidden";name="_method";value 就是我们指定的请求方式
     -->
     <input type="hidden" name="_method" value="put" th:if="${emp != null}">
     <input type="hidden" name="id" th:value="${emp.id}" th:if="${emp != null}">
@@ -1172,9 +1172,90 @@ protected ModelAndView resolveErrorView(HttpServletRequest request, HttpServletR
 
 #### 	1、如何定制错误的页面
 
+1. **有模板引擎的情况下**；/templates/error/状态码; 【将错误页面命名为  错误状态码.html 放在模板引擎文件夹里面的 error文件夹下】，发生此状态码的错误就会来到  对应的页面；
+
+```
+我们可以使用4xx和5xx作为错误页面的文件名来匹配这种类型的所有错误，精确优先（优先寻找精确的状态码.html）；
+页面能获取的信息；
+timestamp：时间戳
+status：状态码
+error：错误提示
+exception：异常对象
+message：异常消息
+errors：JSR303数据校验的错误都在这里
+```
+
+2. 没有模板引擎（**模板引擎找不到这个错误页面**），静态资源文件夹下找；
+3. 以上都没有错误页面，就是**默认来到SpringBoot默认的错误提示页面**；
+
 #### 	2、如何定制错误的json数据
 
+1. 自定义异常处理&返回定制json数据
+
+```
+@ControllerAdvice
+public class MyExceptionHandler {
+
+    @ResponseBody
+    @ExceptionHandler(UserNotExistException.class)
+    public Map<String,Object> handleException(Exception e){
+        Map<String,Object> map = new HashMap<>();
+        map.put("code","user.notexist");
+        map.put("message",e.getMessage());
+        return map;
+    }
+}
+//没有自适应效果...
+```
+
+2. 转发到/error进行自适应响应效果处理
+
+```
+@ExceptionHandler(UserNotExistException.class)
+public String handleException(Exception e, HttpServletRequest request){
+    Map<String,Object> map = new HashMap<>();
+    //传入我们自己的错误状态码  4xx 5xx，否则就不会进入定制错误页面的解析流程
+    /**
+     * Integer statusCode = (Integer) request
+     .getAttribute("javax.servlet.error.status_code");
+     */
+    request.setAttribute("javax.servlet.error.status_code",500);
+    map.put("code","user.notexist");
+    map.put("message",e.getMessage());
+    //转发到/error
+    return "forward:/error";
+}
+```
+
+
+
 #### 	3、将我们的定制数据携带出去
+
+出现错误以后，会来到/error请求，会被BasicErrorController处理，响应出去可以获取的数据是由getErrorAttributes得到的(是AbstractErrorController(ErrorController)规定的方法)；
+
+1. 我们来编写一个ErrorController的实现类【或者是编写AbstractErrorController的子类】，放在容器中；
+
+2. 页面上能用的数据，或者是json返回能用的数据都是通过ErrorAttributes.getErrorAttributes得到；
+
+​	容器中DefaultErrorAttributes.getErrorAttributes()；默认进行数据处理的；
+
+自定义ErrorAttributes
+
+```
+//给容器中加入我们自己定义的ErrorAttributes
+@Component
+public class MyErrorAttributes extends DefaultErrorAttributes {
+
+    @Override
+    public Map<String, Object> getErrorAttributes(RequestAttributes requestAttributes, boolean includeStackTrace) {
+        Map<String, Object> map = super.getErrorAttributes(requestAttributes, includeStackTrace);
+        map.put("company","atguigu");
+        return map;
+    }
+}
+```
+
+**最终的效果**：响应是自适应的，可以通过定制ErrorAttributes改变需要返回的内容
 
 ## 配置嵌入式Servlet容器
 
