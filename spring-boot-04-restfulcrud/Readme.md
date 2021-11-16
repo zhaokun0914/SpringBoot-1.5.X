@@ -1366,7 +1366,7 @@ public ServletRegistrationBean dispatcherServletRegistration(DispatcherServlet d
 
 ### 3、替换为其他嵌入式Servlet容器
 
-![image-20211116184014350](D:\MyCode\springboot1\spring-boot-04-restfulcrud\pic\image-20211116183813546.png)
+![image-20211116184014350](pic/image-20211116183813546.png)
 
 默认支持
 
