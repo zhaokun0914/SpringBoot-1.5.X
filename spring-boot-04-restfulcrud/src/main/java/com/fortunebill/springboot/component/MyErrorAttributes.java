@@ -20,7 +20,9 @@ public class MyErrorAttributes extends DefaultErrorAttributes {
         Map<String, Object> errorAttributes = super.getErrorAttributes(requestAttributes, includeStackTrace);
         errorAttributes.put("company", "fortunebill");
         Map<String, Object> ext = (Map<String, Object>) requestAttributes.getAttribute("ext", RequestAttributes.SCOPE_REQUEST);
-        errorAttributes.put("ext", ext);
+        if (ext != null) {
+            errorAttributes.put("ext", ext);
+        }
         return errorAttributes;
     }
 }

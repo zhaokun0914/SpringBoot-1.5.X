@@ -1259,9 +1259,111 @@ public class MyErrorAttributes extends DefaultErrorAttributes {
 
 ## 配置嵌入式Servlet容器
 
+SpringBoot默认使用Tomcat作为嵌入式的Servlet容器；
+
+问题？
+
 ### 1、如何定制和修改Servlet容器的相关配置
 
+1. 修改和server有关的配置（ServerProperties【也是EmbeddedServletContainerCustomizer】）
+
+```
+server.port=8081
+server.context-path=/crud
+
+server.tomcat.uri-encoding=UTF-8
+
+//通用的Servlet容器设置
+server.xxx
+//Tomcat的设置
+server.tomcat.xxx
+```
+
+2. 编写一个**EmbeddedServletContainerCustomizer**：嵌入式的Servlet容器的定制器；来修改Servlet容器的配置
+
+```
+@Bean  //一定要将这个定制器加入到容器中
+public EmbeddedServletContainerCustomizer embeddedServletContainerCustomizer(){
+    return new EmbeddedServletContainerCustomizer() {
+
+        //定制嵌入式的Servlet容器相关的规则
+        @Override
+        public void customize(ConfigurableEmbeddedServletContainer container) {
+            container.setPort(8083);
+        }
+    };
+}
+```
+
+
+
 ### 2、注册Servlet三大组件【Servlet、Filter、Listener】
+
+由于SpringBoot默认是以jar包的方式启动嵌入式的Servlet容器来启动SpringBoot的web应用，没有web.xml文件。
+
+注册三大组件用以下方式
+
+**Servlet**RegistrationBean
+
+```
+@Bean
+public ServletRegistrationBean myServlet() {
+    ServletRegistrationBean registrationBean = new ServletRegistrationBean(new MyServlet(), "/myServlet");
+    return registrationBean;
+}
+```
+
+**Filter**RegistrationBean
+
+```
+@Bean
+public FilterRegistrationBean myFilter(ServletRegistrationBean myServlet) {
+    // FilterRegistrationBean registrationBean = new FilterRegistrationBean(new MyFilter(), myServlet);
+    FilterRegistrationBean registrationBean = new FilterRegistrationBean();
+    registrationBean.setFilter(new MyFilter());
+    registrationBean.setUrlPatterns(Arrays.asList("/myFilter","/hello"));
+    return registrationBean;
+}
+```
+
+**ServletListener**RegistrationBean
+
+```
+@Bean
+public ServletListenerRegistrationBean<MyListener> myListener() {
+    ServletListenerRegistrationBean<MyListener> registrationBean = new ServletListenerRegistrationBean<>(new MyListener());
+    return registrationBean;
+}
+```
+
+SpringBoot帮我们自动SpringMVC的时候，自动的注册SpringMVC的前端控制器；DispatcherServlet；
+
+DispatcherServletAutoConfiguration中：
+
+```
+@Bean(name = DEFAULT_DISPATCHER_SERVLET_REGISTRATION_BEAN_NAME)
+@ConditionalOnBean(value = DispatcherServlet.class, name = DEFAULT_DISPATCHER_SERVLET_BEAN_NAME)
+public ServletRegistrationBean dispatcherServletRegistration(DispatcherServlet dispatcherServlet) {
+    
+    ServletRegistrationBean registration = new ServletRegistrationBean(dispatcherServlet, this.serverProperties.getServletMapping());
+    // 默认拦截： /  所有请求；包扩静态资源，但是不拦截jsp请求；   /*会拦截jsp
+    // 可以通过server.servletPath来修改SpringMVC前端控制器默认拦截的请求路径
+    
+    registration.setName(DEFAULT_DISPATCHER_SERVLET_BEAN_NAME);
+    registration.setLoadOnStartup(this.webMvcProperties.getServlet().getLoadOnStartup());
+    
+    if (this.multipartConfig != null) {
+        registration.setMultipartConfig(this.multipartConfig);
+    }
+    return registration;
+}
+```
+
+
+
+
+
+**SpringBoot能不能支持其他的Servlet容器？**
 
 ### 3、替换为其他嵌入式Servlet容器
 

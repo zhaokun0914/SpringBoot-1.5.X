@@ -57,8 +57,8 @@
             <h1>error=>[[${error}]]</h1>
             <h1>exception=>[[${exception}]]</h1>
             <h1>message=>[[${message}]]</h1>
-            <h1>ext.message=>[[${ext.message}]]</h1>
-            <h1>ext.code=>[[${ext.code}]]</h1>
+            <h1 th:if="${#request.getAttribute('ext') != null}">ext.message=>[[${ext.message}]]</h1>
+            <h1 th:if="${#request.getAttribute('ext') != null}">ext.code=>[[${ext.code}]]</h1>
             <h1>errors=>[[${errors}]]</h1>
         </main>
     </div>
