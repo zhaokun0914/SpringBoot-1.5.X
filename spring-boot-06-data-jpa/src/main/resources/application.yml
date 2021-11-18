@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    # 数据源基本配置
+    username: root
+    password: 123456
+    url: jdbc:mysql://192.168.5.231:3306/mybatis?useSSL=false&&useUnicode=true&&characterEncoding=utf8
+    # useSSL：否则日志中会有warn警告
+    # useUnicode：确认启用UTF-8编码
+    # characterEncoding：如果不与数据库字符集相同，则会导致存储中文时乱码
+    driver-class-name: com.mysql.jdbc.Driver
+#    schema:
+#      - classpath*:sql/employee.sql
+#      - classpath*:sql/department.sql
+  jpa:
+    hibernate:
+      # 更新或者创建数据表结构
+      ddl-auto: update
+    # 控制台显示SQL
+    show-sql: true
