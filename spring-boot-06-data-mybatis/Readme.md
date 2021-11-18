@@ -2,7 +2,7 @@
 
 ## 整合MyBatis
 
-```
+```xml
 <dependency>
     <groupId>org.mybatis.spring.boot</groupId>
     <artifactId>mybatis-spring-boot-starter</artifactId>
@@ -22,7 +22,7 @@
 
 ## 注解版
 
-```
+```java
 //指定这是一个操作数据库的mapper
 @Mapper
 public interface DepartmentMapper {
@@ -46,7 +46,7 @@ public interface DepartmentMapper {
 
 自定义MyBatis的配置规则；给容器中添加一个ConfigurationCustomizer；
 
-```
+```java
 @org.springframework.context.annotation.Configuration
 public class MyBatisConfig {
 
@@ -59,8 +59,8 @@ public class MyBatisConfig {
 }
 ```
 
-```
-使用MapperScan批量扫描所有的Mapper接口；
+```java
+// 使用MapperScan批量扫描所有的Mapper接口；
 @MapperScan(value = "com.atguigu.springboot.mapper")
 @SpringBootApplication
 public class SpringBoot06DataMybatisApplication {
@@ -73,7 +73,7 @@ public class SpringBoot06DataMybatisApplication {
 
 ### 配置文件版
 
-```
+```yml
 mybatis:
   config-location: classpath:mybatis/mybatis-config.xml 指定全局配置文件的位置
   mapper-locations: classpath:mybatis/mapper/*.xml  指定sql映射文件的位置
