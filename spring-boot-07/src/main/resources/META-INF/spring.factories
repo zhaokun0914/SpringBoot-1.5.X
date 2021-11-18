@@ -1,0 +1,5 @@
+org.springframework.context.ApplicationContextInitializer=\
+com.fortunebill.springboot.listener.HelloApplicationContextInitializer
+
+org.springframework.boot.SpringApplicationRunListener=\
+com.fortunebill.springboot.listener.HelloSpringApplicationRunListener
